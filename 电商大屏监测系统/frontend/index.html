@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>双十一实时电商大屏</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { background: #0a0e27; color: #fff; font-family: "Microsoft YaHei", "PingFang SC", sans-serif; overflow-x: hidden; }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      #loading-hint { display: flex; align-items: center; justify-content: center; height: 100vh; color: #8892b0; font-size: 15px; flex-direction: column; gap: 12px; }
+      #loading-hint .dot { width: 32px; height: 32px; border: 3px solid rgba(255,255,255,0.1); border-top-color: #00d4ff; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <div id="loading-hint">
+        <div class="dot"></div>
+        <span id="status-text">JS 加载中...</span>
+      </div>
+    </div>
+    <script>
+      // Catch module script load errors
+      window.__status = function(msg) {
+        var el = document.getElementById('status-text');
+        if (el) el.textContent = msg;
+      };
+      // Global error catch via MutationObserver — watch for script errors in module
+      window.addEventListener('error', function(e) {
+        var root = document.getElementById('root');
+        root.innerHTML = '<div style="color:#ff6b6b;padding:40px;font-size:16px;text-align:center;margin-top:100px;line-height:2;">❌ 页面加载错误<br><small style="color:#8892b0;">' + e.message + '<br>' + (e.filename || '') + ':' + e.lineno + '</small></div>';
+      }, true);
+      window.addEventListener('unhandledrejection', function(e) {
+        var root = document.getElementById('root');
+        root.innerHTML = '<div style="color:#ffd93d;padding:40px;font-size:16px;text-align:center;margin-top:100px;line-height:2;">⚠️ 未捕获的 Promise 错误<br><small style="color:#8892b0;">' + (e.reason && e.reason.message ? e.reason.message : String(e.reason)) + '</small></div>';
+      });
+    </script>
+    <script type="module">
+      window.__status('React 模块加载中...');
+      import "/src/main.jsx";
+    </script>
+  </body>
+</html>
